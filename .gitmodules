@@ -1,0 +1,6 @@
+[submodule "tools"]
+	path = tools
+	url = https://github.com/golang/tools
+[submodule "vscode-languageserver-node"]
+	path = vscode-languageserver-node
+	url = https://github.com/microsoft/vscode-languageserver-node
