@@ -64,7 +64,7 @@ type Client interface {
 func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bool, any, error) {
 	defer recoverHandlerPanic(r.Method)
 	switch r.Method {
-	case MethodLogTrace:
+	case RPCMethodLogTrace:
 		var params LogTraceParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -72,7 +72,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.LogTrace(ctx, &params)
 		return true, nil, err
 
-	case MethodProgress:
+	case RPCMethodProgress:
 		var params ProgressParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -80,7 +80,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.Progress(ctx, &params)
 		return true, nil, err
 
-	case MethodRegisterCapability:
+	case RPCMethodRegisterCapability:
 		var params RegistrationParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -88,7 +88,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.RegisterCapability(ctx, &params)
 		return true, nil, err
 
-	case MethodUnregisterCapability:
+	case RPCMethodUnregisterCapability:
 		var params UnregistrationParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -96,7 +96,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.UnregisterCapability(ctx, &params)
 		return true, nil, err
 
-	case MethodEvent:
+	case RPCMethodEvent:
 		var params interface{}
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -104,7 +104,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.Event(ctx, &params)
 		return true, nil, err
 
-	case MethodPublishDiagnostics:
+	case RPCMethodPublishDiagnostics:
 		var params PublishDiagnosticsParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -112,7 +112,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.PublishDiagnostics(ctx, &params)
 		return true, nil, err
 
-	case MethodLogMessage:
+	case RPCMethodLogMessage:
 		var params LogMessageParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -120,7 +120,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.LogMessage(ctx, &params)
 		return true, nil, err
 
-	case MethodShowDocument:
+	case RPCMethodShowDocument:
 		var params ShowDocumentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -131,7 +131,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case MethodShowMessage:
+	case RPCMethodShowMessage:
 		var params ShowMessageParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -139,7 +139,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.ShowMessage(ctx, &params)
 		return true, nil, err
 
-	case MethodShowMessageRequest:
+	case RPCMethodShowMessageRequest:
 		var params ShowMessageRequestParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -150,7 +150,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case MethodWorkDoneProgressCreate:
+	case RPCMethodWorkDoneProgressCreate:
 		var params WorkDoneProgressCreateParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -158,7 +158,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.WorkDoneProgressCreate(ctx, &params)
 		return true, nil, err
 
-	case MethodApplyEdit:
+	case RPCMethodApplyEdit:
 		var params ApplyWorkspaceEditParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -169,11 +169,11 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case MethodCodeLensRefresh:
+	case RPCMethodCodeLensRefresh:
 		err := client.CodeLensRefresh(ctx)
 		return true, nil, err
 
-	case MethodConfiguration:
+	case RPCMethodConfiguration:
 		var params ParamConfiguration
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -184,27 +184,27 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case MethodDiagnosticRefresh:
+	case RPCMethodDiagnosticRefresh:
 		err := client.DiagnosticRefresh(ctx)
 		return true, nil, err
 
-	case MethodFoldingRangeRefresh:
+	case RPCMethodFoldingRangeRefresh:
 		err := client.FoldingRangeRefresh(ctx)
 		return true, nil, err
 
-	case MethodInlayHintRefresh:
+	case RPCMethodInlayHintRefresh:
 		err := client.InlayHintRefresh(ctx)
 		return true, nil, err
 
-	case MethodInlineValueRefresh:
+	case RPCMethodInlineValueRefresh:
 		err := client.InlineValueRefresh(ctx)
 		return true, nil, err
 
-	case MethodSemanticTokensRefresh:
+	case RPCMethodSemanticTokensRefresh:
 		err := client.SemanticTokensRefresh(ctx)
 		return true, nil, err
 
-	case MethodTextDocumentContentRefresh:
+	case RPCMethodTextDocumentContentRefresh:
 		var params TextDocumentContentRefreshParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -212,7 +212,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.TextDocumentContentRefresh(ctx, &params)
 		return true, nil, err
 
-	case MethodWorkspaceFolders:
+	case RPCMethodWorkspaceFolders:
 		resp, err := client.WorkspaceFolders(ctx)
 		if err != nil {
 			return true, nil, err

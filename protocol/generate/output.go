@@ -90,11 +90,7 @@ func genCase(_ *Model, method string, param, result *Type, dir string) {
 	out := new(bytes.Buffer)
 
 	fname := methodName(method)
-	if fname == "Completion" {
-		fmt.Fprintf(out, "\tcase %s:\n", "MethodTextDocument"+fname)
-	} else {
-		fmt.Fprintf(out, "\tcase %s:\n", "Method"+fname)
-	}
+	fmt.Fprintf(out, "\tcase %s:\n", "RPCMethod"+fname)
 
 	var p string
 	if notNil(param) {

@@ -101,11 +101,7 @@ func writemethods() {
 	for _, k := range methodNames.keys() {
 		v := methodNames[k]
 
-		if v == "Completion" {
-			v = "TextDocumentCompletion"
-			fmt.Fprintln(out, "// Rename to avoid conflict with MethodCompletion(CompletionItemKind)")
-		}
-		fmt.Fprintf(out, "%s = %q\n", "Method"+v, k)
+		fmt.Fprintf(out, "%s = %q\n", "RPCMethod"+v, k)
 	}
 	out.WriteString(")\n\n")
 	formatTo("tsmethod.go", out.Bytes())
