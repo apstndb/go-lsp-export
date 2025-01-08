@@ -170,7 +170,7 @@ type Server interface {
 func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bool, any, error) {
 	defer recoverHandlerPanic(r.Method)
 	switch r.Method {
-	case "$/progress":
+	case MethodProgress:
 		var params ProgressParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -178,7 +178,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.Progress(ctx, &params)
 		return true, nil, err
 
-	case "$/setTrace":
+	case MethodSetTrace:
 		var params SetTraceParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -186,7 +186,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.SetTrace(ctx, &params)
 		return true, nil, err
 
-	case "callHierarchy/incomingCalls":
+	case MethodIncomingCalls:
 		var params CallHierarchyIncomingCallsParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -197,7 +197,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "callHierarchy/outgoingCalls":
+	case MethodOutgoingCalls:
 		var params CallHierarchyOutgoingCallsParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -208,7 +208,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "codeAction/resolve":
+	case MethodResolveCodeAction:
 		var params CodeAction
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -219,7 +219,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "codeLens/resolve":
+	case MethodResolveCodeLens:
 		var params CodeLens
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -230,7 +230,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "completionItem/resolve":
+	case MethodResolveCompletionItem:
 		var params CompletionItem
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -241,7 +241,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "documentLink/resolve":
+	case MethodResolveDocumentLink:
 		var params DocumentLink
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -252,11 +252,11 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "exit":
+	case MethodExit:
 		err := server.Exit(ctx)
 		return true, nil, err
 
-	case "initialize":
+	case MethodInitialize:
 		var params ParamInitialize
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -267,7 +267,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "initialized":
+	case MethodInitialized:
 		var params InitializedParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -275,7 +275,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.Initialized(ctx, &params)
 		return true, nil, err
 
-	case "inlayHint/resolve":
+	case MethodResolve:
 		var params InlayHint
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -286,7 +286,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "notebookDocument/didChange":
+	case MethodDidChangeNotebookDocument:
 		var params DidChangeNotebookDocumentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -294,7 +294,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidChangeNotebookDocument(ctx, &params)
 		return true, nil, err
 
-	case "notebookDocument/didClose":
+	case MethodDidCloseNotebookDocument:
 		var params DidCloseNotebookDocumentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -302,7 +302,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidCloseNotebookDocument(ctx, &params)
 		return true, nil, err
 
-	case "notebookDocument/didOpen":
+	case MethodDidOpenNotebookDocument:
 		var params DidOpenNotebookDocumentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -310,7 +310,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidOpenNotebookDocument(ctx, &params)
 		return true, nil, err
 
-	case "notebookDocument/didSave":
+	case MethodDidSaveNotebookDocument:
 		var params DidSaveNotebookDocumentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -318,11 +318,11 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidSaveNotebookDocument(ctx, &params)
 		return true, nil, err
 
-	case "shutdown":
+	case MethodShutdown:
 		err := server.Shutdown(ctx)
 		return true, nil, err
 
-	case "textDocument/codeAction":
+	case MethodCodeAction:
 		var params CodeActionParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -333,7 +333,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/codeLens":
+	case MethodCodeLens:
 		var params CodeLensParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -344,7 +344,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/colorPresentation":
+	case MethodColorPresentation:
 		var params ColorPresentationParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -355,7 +355,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/completion":
+	case MethodTextDocumentCompletion:
 		var params CompletionParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -366,7 +366,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/declaration":
+	case MethodDeclaration:
 		var params DeclarationParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -377,7 +377,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/definition":
+	case MethodDefinition:
 		var params DefinitionParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -388,7 +388,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/diagnostic":
+	case MethodDiagnostic:
 		var params DocumentDiagnosticParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -399,7 +399,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/didChange":
+	case MethodDidChange:
 		var params DidChangeTextDocumentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -407,7 +407,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidChange(ctx, &params)
 		return true, nil, err
 
-	case "textDocument/didClose":
+	case MethodDidClose:
 		var params DidCloseTextDocumentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -415,7 +415,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidClose(ctx, &params)
 		return true, nil, err
 
-	case "textDocument/didOpen":
+	case MethodDidOpen:
 		var params DidOpenTextDocumentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -423,7 +423,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidOpen(ctx, &params)
 		return true, nil, err
 
-	case "textDocument/didSave":
+	case MethodDidSave:
 		var params DidSaveTextDocumentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -431,7 +431,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidSave(ctx, &params)
 		return true, nil, err
 
-	case "textDocument/documentColor":
+	case MethodDocumentColor:
 		var params DocumentColorParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -442,7 +442,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/documentHighlight":
+	case MethodDocumentHighlight:
 		var params DocumentHighlightParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -453,7 +453,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/documentLink":
+	case MethodDocumentLink:
 		var params DocumentLinkParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -464,7 +464,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/documentSymbol":
+	case MethodDocumentSymbol:
 		var params DocumentSymbolParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -475,7 +475,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/foldingRange":
+	case MethodFoldingRange:
 		var params FoldingRangeParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -486,7 +486,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/formatting":
+	case MethodFormatting:
 		var params DocumentFormattingParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -497,7 +497,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/hover":
+	case MethodHover:
 		var params HoverParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -508,7 +508,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/implementation":
+	case MethodImplementation:
 		var params ImplementationParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -519,7 +519,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/inlayHint":
+	case MethodInlayHint:
 		var params InlayHintParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -530,7 +530,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/inlineCompletion":
+	case MethodInlineCompletion:
 		var params InlineCompletionParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -541,7 +541,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/inlineValue":
+	case MethodInlineValue:
 		var params InlineValueParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -552,7 +552,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/linkedEditingRange":
+	case MethodLinkedEditingRange:
 		var params LinkedEditingRangeParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -563,7 +563,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/moniker":
+	case MethodMoniker:
 		var params MonikerParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -574,7 +574,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/onTypeFormatting":
+	case MethodOnTypeFormatting:
 		var params DocumentOnTypeFormattingParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -585,7 +585,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/prepareCallHierarchy":
+	case MethodPrepareCallHierarchy:
 		var params CallHierarchyPrepareParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -596,7 +596,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/prepareRename":
+	case MethodPrepareRename:
 		var params PrepareRenameParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -607,7 +607,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/prepareTypeHierarchy":
+	case MethodPrepareTypeHierarchy:
 		var params TypeHierarchyPrepareParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -618,7 +618,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/rangeFormatting":
+	case MethodRangeFormatting:
 		var params DocumentRangeFormattingParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -629,7 +629,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/rangesFormatting":
+	case MethodRangesFormatting:
 		var params DocumentRangesFormattingParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -640,7 +640,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/references":
+	case MethodReferences:
 		var params ReferenceParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -651,7 +651,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/rename":
+	case MethodRename:
 		var params RenameParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -662,7 +662,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/selectionRange":
+	case MethodSelectionRange:
 		var params SelectionRangeParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -673,7 +673,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/semanticTokens/full":
+	case MethodSemanticTokensFull:
 		var params SemanticTokensParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -684,7 +684,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/semanticTokens/full/delta":
+	case MethodSemanticTokensFullDelta:
 		var params SemanticTokensDeltaParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -695,7 +695,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/semanticTokens/range":
+	case MethodSemanticTokensRange:
 		var params SemanticTokensRangeParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -706,7 +706,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/signatureHelp":
+	case MethodSignatureHelp:
 		var params SignatureHelpParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -717,7 +717,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/typeDefinition":
+	case MethodTypeDefinition:
 		var params TypeDefinitionParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -728,7 +728,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "textDocument/willSave":
+	case MethodWillSave:
 		var params WillSaveTextDocumentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -736,7 +736,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.WillSave(ctx, &params)
 		return true, nil, err
 
-	case "textDocument/willSaveWaitUntil":
+	case MethodWillSaveWaitUntil:
 		var params WillSaveTextDocumentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -747,7 +747,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "typeHierarchy/subtypes":
+	case MethodSubtypes:
 		var params TypeHierarchySubtypesParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -758,7 +758,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "typeHierarchy/supertypes":
+	case MethodSupertypes:
 		var params TypeHierarchySupertypesParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -769,7 +769,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "window/workDoneProgress/cancel":
+	case MethodWorkDoneProgressCancel:
 		var params WorkDoneProgressCancelParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -777,7 +777,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.WorkDoneProgressCancel(ctx, &params)
 		return true, nil, err
 
-	case "workspace/diagnostic":
+	case MethodDiagnosticWorkspace:
 		var params WorkspaceDiagnosticParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -788,7 +788,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "workspace/didChangeConfiguration":
+	case MethodDidChangeConfiguration:
 		var params DidChangeConfigurationParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -796,7 +796,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidChangeConfiguration(ctx, &params)
 		return true, nil, err
 
-	case "workspace/didChangeWatchedFiles":
+	case MethodDidChangeWatchedFiles:
 		var params DidChangeWatchedFilesParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -804,7 +804,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidChangeWatchedFiles(ctx, &params)
 		return true, nil, err
 
-	case "workspace/didChangeWorkspaceFolders":
+	case MethodDidChangeWorkspaceFolders:
 		var params DidChangeWorkspaceFoldersParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -812,7 +812,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidChangeWorkspaceFolders(ctx, &params)
 		return true, nil, err
 
-	case "workspace/didCreateFiles":
+	case MethodDidCreateFiles:
 		var params CreateFilesParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -820,7 +820,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidCreateFiles(ctx, &params)
 		return true, nil, err
 
-	case "workspace/didDeleteFiles":
+	case MethodDidDeleteFiles:
 		var params DeleteFilesParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -828,7 +828,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidDeleteFiles(ctx, &params)
 		return true, nil, err
 
-	case "workspace/didRenameFiles":
+	case MethodDidRenameFiles:
 		var params RenameFilesParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -836,7 +836,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		err := server.DidRenameFiles(ctx, &params)
 		return true, nil, err
 
-	case "workspace/executeCommand":
+	case MethodExecuteCommand:
 		var params ExecuteCommandParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -847,7 +847,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "workspace/symbol":
+	case MethodSymbol:
 		var params WorkspaceSymbolParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -858,7 +858,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "workspace/textDocumentContent":
+	case MethodTextDocumentContent:
 		var params TextDocumentContentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -869,7 +869,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "workspace/willCreateFiles":
+	case MethodWillCreateFiles:
 		var params CreateFilesParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -880,7 +880,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "workspace/willDeleteFiles":
+	case MethodWillDeleteFiles:
 		var params DeleteFilesParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -891,7 +891,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "workspace/willRenameFiles":
+	case MethodWillRenameFiles:
 		var params RenameFilesParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -902,7 +902,7 @@ func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "workspaceSymbol/resolve":
+	case MethodResolveWorkspaceSymbol:
 		var params WorkspaceSymbol
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)

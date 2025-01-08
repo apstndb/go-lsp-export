@@ -64,7 +64,7 @@ type Client interface {
 func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bool, any, error) {
 	defer recoverHandlerPanic(r.Method)
 	switch r.Method {
-	case "$/logTrace":
+	case MethodLogTrace:
 		var params LogTraceParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -72,7 +72,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.LogTrace(ctx, &params)
 		return true, nil, err
 
-	case "$/progress":
+	case MethodProgress:
 		var params ProgressParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -80,7 +80,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.Progress(ctx, &params)
 		return true, nil, err
 
-	case "client/registerCapability":
+	case MethodRegisterCapability:
 		var params RegistrationParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -88,7 +88,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.RegisterCapability(ctx, &params)
 		return true, nil, err
 
-	case "client/unregisterCapability":
+	case MethodUnregisterCapability:
 		var params UnregistrationParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -96,7 +96,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.UnregisterCapability(ctx, &params)
 		return true, nil, err
 
-	case "telemetry/event":
+	case MethodEvent:
 		var params interface{}
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -104,7 +104,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.Event(ctx, &params)
 		return true, nil, err
 
-	case "textDocument/publishDiagnostics":
+	case MethodPublishDiagnostics:
 		var params PublishDiagnosticsParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -112,7 +112,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.PublishDiagnostics(ctx, &params)
 		return true, nil, err
 
-	case "window/logMessage":
+	case MethodLogMessage:
 		var params LogMessageParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -120,7 +120,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.LogMessage(ctx, &params)
 		return true, nil, err
 
-	case "window/showDocument":
+	case MethodShowDocument:
 		var params ShowDocumentParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -131,7 +131,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "window/showMessage":
+	case MethodShowMessage:
 		var params ShowMessageParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -139,7 +139,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.ShowMessage(ctx, &params)
 		return true, nil, err
 
-	case "window/showMessageRequest":
+	case MethodShowMessageRequest:
 		var params ShowMessageRequestParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -150,7 +150,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "window/workDoneProgress/create":
+	case MethodWorkDoneProgressCreate:
 		var params WorkDoneProgressCreateParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -158,7 +158,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.WorkDoneProgressCreate(ctx, &params)
 		return true, nil, err
 
-	case "workspace/applyEdit":
+	case MethodApplyEdit:
 		var params ApplyWorkspaceEditParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -169,11 +169,11 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "workspace/codeLens/refresh":
+	case MethodCodeLensRefresh:
 		err := client.CodeLensRefresh(ctx)
 		return true, nil, err
 
-	case "workspace/configuration":
+	case MethodConfiguration:
 		var params ParamConfiguration
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -184,27 +184,27 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		}
 		return true, resp, nil
 
-	case "workspace/diagnostic/refresh":
+	case MethodDiagnosticRefresh:
 		err := client.DiagnosticRefresh(ctx)
 		return true, nil, err
 
-	case "workspace/foldingRange/refresh":
+	case MethodFoldingRangeRefresh:
 		err := client.FoldingRangeRefresh(ctx)
 		return true, nil, err
 
-	case "workspace/inlayHint/refresh":
+	case MethodInlayHintRefresh:
 		err := client.InlayHintRefresh(ctx)
 		return true, nil, err
 
-	case "workspace/inlineValue/refresh":
+	case MethodInlineValueRefresh:
 		err := client.InlineValueRefresh(ctx)
 		return true, nil, err
 
-	case "workspace/semanticTokens/refresh":
+	case MethodSemanticTokensRefresh:
 		err := client.SemanticTokensRefresh(ctx)
 		return true, nil, err
 
-	case "workspace/textDocumentContent/refresh":
+	case MethodTextDocumentContentRefresh:
 		var params TextDocumentContentRefreshParams
 		if err := UnmarshalJSON(r.Params, &params); err != nil {
 			return true, nil, sendParseError(ctx, err)
@@ -212,7 +212,7 @@ func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bo
 		err := client.TextDocumentContentRefresh(ctx, &params)
 		return true, nil, err
 
-	case "workspace/workspaceFolders":
+	case MethodWorkspaceFolders:
 		resp, err := client.WorkspaceFolders(ctx)
 		if err != nil {
 			return true, nil, err

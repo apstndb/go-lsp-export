@@ -88,9 +88,15 @@ func genDecl(model *Model, method string, param, result *Type, dir string) {
 
 func genCase(_ *Model, method string, param, result *Type, dir string) {
 	out := new(bytes.Buffer)
-	fmt.Fprintf(out, "\tcase %q:\n", method)
-	var p string
+
 	fname := methodName(method)
+	if fname == "Completion" {
+		fmt.Fprintf(out, "\tcase %s:\n", "MethodTextDocument"+fname)
+	} else {
+		fmt.Fprintf(out, "\tcase %s:\n", "Method"+fname)
+	}
+
+	var p string
 	if notNil(param) {
 		nm := goplsName(param)
 		if method == "workspace/configuration" { // gopls compatibility

@@ -84,12 +84,32 @@ func processinline() {
 	writeserver()
 	writeprotocol()
 	writejsons()
+	writemethods()
 
 	checkTables()
 }
 
 // common file header for output files
 var fileHdr string
+
+func writemethods() {
+	out := new(bytes.Buffer)
+	fmt.Fprintln(out, fileHdr)
+	out.WriteString("const (\n")
+
+	var methodNames sortedMap[string] = methodNames
+	for _, k := range methodNames.keys() {
+		v := methodNames[k]
+
+		if v == "Completion" {
+			v = "TextDocumentCompletion"
+			fmt.Fprintln(out, "// Rename to avoid conflict with MethodCompletion(CompletionItemKind)")
+		}
+		fmt.Fprintf(out, "%s = %q\n", "Method"+v, k)
+	}
+	out.WriteString(")\n\n")
+	formatTo("tsmethod.go", out.Bytes())
+}
 
 func writeclient() {
 	out := new(bytes.Buffer)
