@@ -53,7 +53,7 @@ func genDecl(model *Model, method string, param, result *Type, dir string) {
 	fname := methodName(method)
 	p := ""
 	if notNil(param) {
-		p = ", *" + goplsName(param)
+		p = ", params *" + goplsName(param)
 	}
 	ret := "error"
 	if notNil(result) {
@@ -68,11 +68,11 @@ func genDecl(model *Model, method string, param, result *Type, dir string) {
 	case "workspace/configuration":
 		// was And_Param_workspace_configuration, but the type substitution doesn't work,
 		// as ParamConfiguration is embedded in And_Param_workspace_configuration
-		p = ", *ParamConfiguration"
+		p = ", params *ParamConfiguration"
 		ret = "([]LSPAny, error)"
 	}
 	fragment := strings.ReplaceAll(strings.TrimPrefix(method, "$/"), "/", "_")
-	msg := fmt.Sprintf("\t%s\t%s(context.Context%s) %s\n", lspLink(model, fragment), fname, p, ret)
+	msg := fmt.Sprintf("\t%s\t%s(ctx context.Context%s) %s\n", lspLink(model, fragment), fname, p, ret)
 	switch dir {
 	case "clientToServer":
 		sdecls[method] = msg
@@ -99,19 +99,19 @@ func genCase(_ *Model, method string, param, result *Type, dir string) {
 			nm = "ParamConfiguration" // gopls compatibility
 		}
 		fmt.Fprintf(out, "\t\tvar params %s\n", nm)
-		fmt.Fprintf(out, "\t\tif err := UnmarshalJSON(r.Params(), &params); err != nil {\n")
-		fmt.Fprintf(out, "\t\t\treturn true, sendParseError(ctx, reply, err)\n\t\t}\n")
+		fmt.Fprintf(out, "\t\tif err := UnmarshalJSON(r.Params, &params); err != nil {\n")
+		fmt.Fprintf(out, "\t\t\treturn true, nil, sendParseError(ctx, err)\n\t\t}\n")
 		p = ", &params"
 	}
 	if notNil(result) {
 		fmt.Fprintf(out, "\t\tresp, err := %%s.%s(ctx%s)\n", fname, p)
 		out.WriteString("\t\tif err != nil {\n")
-		out.WriteString("\t\t\treturn true, reply(ctx, nil, err)\n")
+		out.WriteString("\t\t\treturn true, nil, err\n")
 		out.WriteString("\t\t}\n")
-		out.WriteString("\t\treturn true, reply(ctx, resp, nil)\n")
+		out.WriteString("\t\treturn true, resp, nil\n")
 	} else {
 		fmt.Fprintf(out, "\t\terr := %%s.%s(ctx%s)\n", fname, p)
-		out.WriteString("\t\treturn true, reply(ctx, nil, err)\n")
+		out.WriteString("\t\treturn true, nil, err\n")
 	}
 	out.WriteString("\n")
 	msg := out.String()
@@ -166,9 +166,9 @@ func genFunc(_ *Model, method string, param, result *Type, dir string, isnotify 
 			}
 		} else {
 			if notNil(param) {
-				fmt.Fprintf(out, "\treturn s.sender.Call(ctx, %q, params, nil)\n", method)
+				fmt.Fprintf(out, "\treturn s.sender.Call(ctx, %q, params).Await(ctx, nil)\n", method)
 			} else {
-				fmt.Fprintf(out, "\treturn s.sender.Call(ctx, %q, nil, nil)\n", method)
+				fmt.Fprintf(out, "\treturn s.sender.Call(ctx, %q, nil).Await(ctx, nil)\n", method)
 			}
 		}
 	} else {
@@ -181,9 +181,9 @@ func genFunc(_ *Model, method string, param, result *Type, dir string, isnotify 
 			}
 		} else {
 			if notNil(param) {
-				fmt.Fprintf(out, "\t\tif err := s.sender.Call(ctx, %q, params, &result); err != nil {\n", method)
+				fmt.Fprintf(out, "\t\tif err := s.sender.Call(ctx, %q, params).Await(ctx, &result); err != nil {\n", method)
 			} else {
-				fmt.Fprintf(out, "\t\tif err := s.sender.Call(ctx, %q, nil, &result); err != nil {\n", method)
+				fmt.Fprintf(out, "\t\tif err := s.sender.Call(ctx, %q, nil).Await(ctx, &result); err != nil {\n", method)
 			}
 		}
 		fmt.Fprintf(out, "\t\treturn nil, err\n\t}\n\treturn result, nil\n")

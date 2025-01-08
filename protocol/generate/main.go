@@ -98,7 +98,7 @@ func writeclient() {
 		`import (
 	"context"
 
-	"golang.org/x/tools/internal/jsonrpc2"
+	"golang.org/x/exp/jsonrpc2"
 )
 `)
 	out.WriteString("type Client interface {\n")
@@ -106,14 +106,14 @@ func writeclient() {
 		out.WriteString(cdecls[k])
 	}
 	out.WriteString("}\n\n")
-	out.WriteString(`func clientDispatch(ctx context.Context, client Client, reply jsonrpc2.Replier, r jsonrpc2.Request) (bool, error) {
-	defer recoverHandlerPanic(r.Method())
-	switch r.Method() {
+	out.WriteString(`func clientDispatch(ctx context.Context, client Client, r *jsonrpc2.Request) (bool, any, error) {
+	defer recoverHandlerPanic(r.Method)
+	switch r.Method {
 `)
 	for _, k := range ccases.keys() {
 		out.WriteString(ccases[k])
 	}
-	out.WriteString(("\tdefault:\n\t\treturn false, nil\n\t}\n}\n\n"))
+	out.WriteString(("\tdefault:\n\t\treturn false, nil, nil\n\t}\n}\n\n"))
 	for _, k := range cfuncs.keys() {
 		out.WriteString(cfuncs[k])
 	}
@@ -127,7 +127,7 @@ func writeserver() {
 		`import (
 	"context"
 
-	"golang.org/x/tools/internal/jsonrpc2"
+	"golang.org/x/exp/jsonrpc2"
 )
 `)
 	out.WriteString("type Server interface {\n")
@@ -137,14 +137,14 @@ func writeserver() {
 	out.WriteString(`
 }
 
-func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, r jsonrpc2.Request) (bool, error) {
-	defer recoverHandlerPanic(r.Method())
-	switch r.Method() {
+func serverDispatch(ctx context.Context, server Server, r *jsonrpc2.Request) (bool, any, error) {
+	defer recoverHandlerPanic(r.Method)
+	switch r.Method {
 `)
 	for _, k := range scases.keys() {
 		out.WriteString(scases[k])
 	}
-	out.WriteString(("\tdefault:\n\t\treturn false, nil\n\t}\n}\n\n"))
+	out.WriteString(("\tdefault:\n\t\treturn false, nil, nil\n\t}\n}\n\n"))
 	for _, k := range sfuncs.keys() {
 		out.WriteString(sfuncs[k])
 	}
@@ -261,7 +261,7 @@ package protocol
 		lspGitRef,                 // 2
 		githash,                   // 3
 		vscodeRepo,                // 4
-		model.Version.Version)     // 5
+		model.Version.Version) // 5
 }
 
 func parse(fname string) *Model {
