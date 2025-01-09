@@ -17,7 +17,7 @@ package difftest
 import (
 	"testing"
 
-	"golang.org/x/tools/internal/diff"
+	"github.com/apstndb/go-lsp-export/internal/diff"
 )
 
 const (

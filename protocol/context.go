@@ -4,18 +4,7 @@
 
 package protocol
 
-import (
-	"bytes"
-	"context"
-	"sync"
-
-	"github.com/apstndb/go-lsp-export/internal/event"
-	"github.com/apstndb/go-lsp-export/internal/event/core"
-	"github.com/apstndb/go-lsp-export/internal/event/export"
-	"github.com/apstndb/go-lsp-export/internal/event/label"
-	"github.com/apstndb/go-lsp-export/internal/xcontext"
-)
-
+/*
 type contextKey int
 
 const (
@@ -59,7 +48,9 @@ func LogEvent(ctx context.Context, ev core.Event, lm label.Map, mt MessageType) 
 	return ctx
 }
 
+
 var (
 	startLogSenderOnce sync.Once
 	logQueue           = make(chan func(), 100) // big enough for a large transient burst
 )
+*/

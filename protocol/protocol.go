@@ -10,11 +10,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 
 	"golang.org/x/exp/jsonrpc2"
 	"golang.org/x/telemetry/crashmonitor"
 
-	"github.com/apstndb/go-lsp-export/internal/util/bug"
 	"github.com/apstndb/go-lsp-export/internal/xcontext"
 )
 
@@ -212,7 +212,7 @@ func recoverHandlerPanic(method string) {
 	if !crashmonitor.Supported() {
 		defer func() {
 			if x := recover(); x != nil {
-				bug.Reportf("panic in %s request", method)
+				slog.Debug("panic in request", slog.String("method", method))
 				panic(x)
 			}
 		}()

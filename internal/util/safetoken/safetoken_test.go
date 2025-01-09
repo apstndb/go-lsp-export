@@ -13,8 +13,8 @@ import (
 	"testing"
 
 	"golang.org/x/tools/go/packages"
+
 	"github.com/apstndb/go-lsp-export/internal/util/safetoken"
-	"golang.org/x/tools/internal/testenv"
 )
 
 func TestWorkaroundIssue57490(t *testing.T) {

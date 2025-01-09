@@ -64,6 +64,8 @@ package protocol
 import (
 	"bytes"
 	"fmt"
+	// replace bug package
+	bug "fmt"
 	"go/ast"
 	"go/token"
 	"sort"
@@ -71,7 +73,6 @@ import (
 	"sync"
 	"unicode/utf8"
 
-	"github.com/apstndb/go-lsp-export/internal/util/bug"
 	"github.com/apstndb/go-lsp-export/internal/util/safetoken"
 )
 
