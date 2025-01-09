@@ -4,7 +4,7 @@ My personal fork of [gopls/internal/protocol](https://github.com/golang/tools/tr
 
 - Migrate JSON-RPC 2 implementation to [golang.org/x/exp/jsonrpc2](https://pkg.go.dev/golang.org/x/exp/jsonrpc2) from internal packages ([jsonrpc2](https://pkg.go.dev/golang.org/x/tools/internal/jsonrpc2) and [jsonrpc2_v2](https://pkg.go.dev/golang.org/x/tools/internal/jsonrpc2_v2)).
 - Remove some internal dependencies.
-- Vendor rest internal dependencies.
+- Vendor rest of internal dependencies.
   - [diff](https://pkg.go.dev/golang.org/x/tools/internal/diff)
   - [pathutil](https://pkg.go.dev/golang.org/x/tools/gopls/internal/util/pathutil)
   - [safetoken](https://pkg.go.dev/golang.org/x/tools/gopls/internal/util/safetoken)
