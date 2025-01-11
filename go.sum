@@ -1,3 +1,5 @@
+github.com/apstndb/gotoolsdiff v0.29.0 h1:PwCCgt5/sjc9Ys5EGaoMtv9i1K1Q1dbmv0tTAEFQc78=
+github.com/apstndb/gotoolsdiff v0.29.0/go.mod h1:w/0yu9ZF6Gdwo/IlCjUvBthYFXnNE8k0r2q/hNp4iJg=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 golang.org/x/exp/event v0.0.0-20220217172124-1812c5b45e43 h1:Yn6OLQDombmcne/0Jf2GiY4qPS5ML2W4KYFyx2uYxGY=
