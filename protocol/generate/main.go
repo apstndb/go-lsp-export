@@ -239,25 +239,12 @@ func formatTo(basename string, src []byte) {
 
 // create the common file header for the output files
 func fileHeader(model *Model) string {
-	fname := filepath.Join(*repodir, ".git", "HEAD")
-	buf, err := os.ReadFile(fname)
+	cmd := exec.Command("git", "-C", *repodir, "rev-parse", "HEAD")
+	buf, err := cmd.Output()
 	if err != nil {
 		log.Fatal(err)
 	}
-	buf = bytes.TrimSpace(buf)
-	var githash string
-	if len(buf) == 40 {
-		githash = string(buf[:40])
-	} else if bytes.HasPrefix(buf, []byte("ref: ")) {
-		fname = filepath.Join(*repodir, ".git", string(buf[5:]))
-		buf, err = os.ReadFile(fname)
-		if err != nil {
-			log.Fatal(err)
-		}
-		githash = string(buf[:40])
-	} else {
-		log.Fatalf("githash cannot be recovered from %s", fname)
-	}
+	githash := string(bytes.TrimSpace(buf))
 
 	format := `// Copyright 2023 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
