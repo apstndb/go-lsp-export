@@ -265,9 +265,11 @@ func formatTo(basename string, src []byte) {
 // create the common file header for the output files
 func fileHeader(model *Model) string {
 	cmd := exec.Command("git", "-C", *repodir, "rev-parse", "HEAD")
-	buf, err := cmd.CombinedOutput()
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	buf, err := cmd.Output()
 	if err != nil {
-		log.Fatalf("git rev-parse HEAD in %s failed: %v: %s", *repodir, err, strings.TrimSpace(string(buf)))
+		log.Fatalf("git rev-parse HEAD in %s failed: %v: %s", *repodir, err, strings.TrimSpace(stderr.String()))
 	}
 	githash := string(bytes.TrimSpace(buf))
 
