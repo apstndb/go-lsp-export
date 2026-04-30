@@ -288,8 +288,8 @@ func fileHeader(model *Model) string {
 package protocol
 
 // Code generated from %[1]s at ref %[2]s.
-// %[4]s/blob/%[2]s/%[1]s
-// LSP metaData.version = %[5]s.
+// %[3]s/blob/%[2]s/%[1]s
+// LSP metaData.version = %[4]s.
 
 `
 	return fmt.Sprintf(format,

@@ -12,8 +12,8 @@
 package protocol
 
 // Code generated from protocol/metaModel.json at ref dadd73f7fc283b4d0adb602adadcf4be16ef3a7b.
-// 3.17.0/blob/dadd73f7fc283b4d0adb602adadcf4be16ef3a7b/protocol/metaModel.json
-// LSP metaData.version = %!s(BADINDEX).
+// https://github.com/microsoft/vscode-languageserver-node/blob/dadd73f7fc283b4d0adb602adadcf4be16ef3a7b/protocol/metaModel.json
+// LSP metaData.version = 3.17.0.
 
 import "encoding/json"
 
