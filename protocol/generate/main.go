@@ -263,11 +263,17 @@ func formatTo(basename string, src []byte) {
 // create the common file header for the output files
 func fileHeader(model *Model) string {
 	cmd := exec.Command("git", "-C", *repodir, "rev-parse", "HEAD")
-	buf, err := cmd.Output()
+	buf, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("git rev-parse HEAD in %s failed: %v: %s", *repodir, err, strings.TrimSpace(string(buf)))
 	}
 	githash := string(bytes.TrimSpace(buf))
+
+	// For local directories, use the commit hash as the ref so blob URLs remain valid.
+	ref := lspGitRef
+	if strings.HasPrefix(ref, "(not git") {
+		ref = githash
+	}
 
 	format := `// Copyright 2023 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
@@ -278,16 +284,16 @@ func fileHeader(model *Model) string {
 package protocol
 
 // Code generated from %[1]s at ref %[2]s (hash %[3]s).
-// %[4]s/blob/%[2]s/%[1]s
+// %[4]s/blob/%[3]s/%[1]s
 // LSP metaData.version = %[5]s.
 
 `
 	return fmt.Sprintf(format,
 		"protocol/metaModel.json", // 1
-		lspGitRef,                 // 2
+		ref,                       // 2
 		githash,                   // 3
 		vscodeRepo,                // 4
-		model.Version.Version) // 5
+		model.Version.Version)     // 5
 }
 
 func parse(fname string) *Model {
