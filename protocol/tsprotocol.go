@@ -2499,14 +2499,14 @@ type FileSystemWatcher struct {
 type FoldingRange struct {
 	// The zero-based start line of the range to fold. The folded area starts after the line's last character.
 	// To be valid, the end must be zero or larger and smaller than the number of lines in the document.
-	StartLine uint32 `json:"startLine"`
+	StartLine *uint32 `json:"startLine,omitempty"`
 	// The zero-based character offset from where the folded range starts. If not defined, defaults to the length of the start line.
-	StartCharacter uint32 `json:"startCharacter,omitempty"`
+	StartCharacter *uint32 `json:"startCharacter,omitempty"`
 	// The zero-based end line of the range to fold. The folded area ends with the line's last character.
 	// To be valid, the end must be zero or larger and smaller than the number of lines in the document.
-	EndLine uint32 `json:"endLine"`
+	EndLine *uint32 `json:"endLine,omitempty"`
 	// The zero-based character offset before the folded range ends. If not defined, defaults to the length of the end line.
-	EndCharacter uint32 `json:"endCharacter,omitempty"`
+	EndCharacter *uint32 `json:"endCharacter,omitempty"`
 	// Describes the kind of the folding range such as 'comment' or 'region'. The kind
 	// is used to categorize folding ranges and used by commands like 'Fold all comments'.
 	// See {@link FoldingRangeKind} for an enumeration of standardized kinds.
@@ -4493,14 +4493,11 @@ type RenameOptions struct {
 //
 // See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#renameParams
 type RenameParams struct {
-	// The document to rename.
-	TextDocument TextDocumentIdentifier `json:"textDocument"`
-	// The position at which this request was sent.
-	Position Position `json:"position"`
 	// The new name of the symbol. If the given name is not valid the
 	// request must return a {@link ResponseError} with an
 	// appropriate message set.
 	NewName string `json:"newName"`
+	TextDocumentPositionParams
 	WorkDoneProgressParams
 }
 
@@ -5041,7 +5038,7 @@ type SignatureHelp struct {
 	// In future version of the protocol this property might become
 	// mandatory (but still nullable) to better express the active parameter if
 	// the active signature does have any.
-	ActiveParameter uint32 `json:"activeParameter,omitempty"`
+	ActiveParameter *uint32 `json:"activeParameter,omitempty"`
 }
 
 // Client Capabilities for a {@link SignatureHelpRequest}.
@@ -5153,7 +5150,7 @@ type SignatureInformation struct {
 	// `SignatureHelp.activeParameter`.
 	//
 	// @since 3.16.0
-	ActiveParameter uint32 `json:"activeParameter,omitempty"`
+	ActiveParameter *uint32 `json:"activeParameter,omitempty"`
 }
 
 // An interactive text edit.
@@ -5382,7 +5379,7 @@ type TextDocumentContentChangePartial struct {
 	// The optional length of the range that got replaced.
 	//
 	// @deprecated use range instead.
-	RangeLength uint32 `json:"rangeLength,omitempty"`
+	RangeLength *uint32 `json:"rangeLength,omitempty"`
 	// The new text for the provided range.
 	Text string `json:"text"`
 }
@@ -5913,7 +5910,7 @@ type WorkDoneProgressBegin struct {
 	//
 	// The value should be steadily rising. Clients are free to ignore values
 	// that are not following this rule. The value range is [0, 100].
-	Percentage uint32 `json:"percentage,omitempty"`
+	Percentage *uint32 `json:"percentage,omitempty"`
 }
 
 // See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#workDoneProgressCancelParams
@@ -5973,7 +5970,7 @@ type WorkDoneProgressReport struct {
 	//
 	// The value should be steadily rising. Clients are free to ignore values
 	// that are not following this rule. The value range is [0, 100]
-	Percentage uint32 `json:"percentage,omitempty"`
+	Percentage *uint32 `json:"percentage,omitempty"`
 }
 
 // Workspace specific client capabilities.
