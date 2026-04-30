@@ -81,8 +81,9 @@ func processinline() {
 	// See microsoft/vscode-languageserver-node#1698.
 	//
 	// TODO: delete the patch logic after releasing lsp 3.18.
-	for i := range model.Structures {
-		s := model.Structures[i]
+	// model.Structures is []*Structure, so s is a pointer copy.
+	// Mutating s.Properties / s.Extends affects the original element.
+	for _, s := range model.Structures {
 		if s.Name == "RenameParams" {
 			s.Properties = slices.DeleteFunc(s.Properties, func(t NameType) bool {
 				return t.Name == "position" || t.Name == "textDocument"
