@@ -4,10 +4,11 @@
 
 Files matching `protocol/ts*.go` are **machine-generated** from the VSCode LSP `metaModel.json`.
 
-- All doc comments are **verbatim copies** from the upstream specification.
-- Do **not** flag typos, grammar issues, or terminology inconsistencies in these comments.
-- Do **not** suggest rewording doc comments.
-- If a comment contains an error, it should be reported to `microsoft/vscode-languageserver-node`, not patched in this repository.
+- Doc comments on generated declarations (structs, consts, methods) are **verbatim copies** from the upstream specification.
+- The generated file header and any repo-specific package notes are not from upstream.
+- Do **not** flag typos, grammar issues, or terminology inconsistencies in spec-derived doc comments.
+- Do **not** suggest rewording spec-derived doc comments.
+- If a spec-derived comment contains an error, it should be reported to `microsoft/vscode-languageserver-node`, not patched in this repository.
 
 ## Code generator (`protocol/generate/`)
 
