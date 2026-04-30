@@ -269,11 +269,9 @@ func fileHeader(model *Model) string {
 	}
 	githash := string(bytes.TrimSpace(buf))
 
-	// For local directories, use the commit hash as the ref so blob URLs remain valid.
-	ref := lspGitRef
-	if strings.HasPrefix(ref, "(not git") {
-		ref = githash
-	}
+	// Always use the commit hash as the ref so generated headers are deterministic
+	// across different invocation modes (with or without -d) and blob URLs remain valid.
+	ref := githash
 
 	format := `// Copyright 2023 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
@@ -288,17 +286,16 @@ func fileHeader(model *Model) string {
 
 package protocol
 
-// Code generated from %[1]s at ref %[2]s (hash %[3]s).
-// %[4]s/blob/%[3]s/%[1]s
+// Code generated from %[1]s at ref %[2]s.
+// %[4]s/blob/%[2]s/%[1]s
 // LSP metaData.version = %[5]s.
 
 `
 	return fmt.Sprintf(format,
 		"protocol/metaModel.json", // 1
 		ref,                       // 2
-		githash,                   // 3
-		vscodeRepo,                // 4
-		model.Version.Version)     // 5
+		vscodeRepo,                // 3
+		model.Version.Version)     // 4
 }
 
 func parse(fname string) *Model {
