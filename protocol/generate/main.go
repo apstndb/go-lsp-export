@@ -280,6 +280,11 @@ func fileHeader(model *Model) string {
 // license that can be found in the LICENSE file.
 
 // Code generated for LSP. DO NOT EDIT.
+//
+// Doc comments in this file are verbatim copies from the upstream LSP
+// specification (metaModel.json). Typos, grammar issues, or terminology
+// inconsistencies in comments should be reported to
+// https://github.com/microsoft/vscode-languageserver-node, not patched here.
 
 package protocol
 
