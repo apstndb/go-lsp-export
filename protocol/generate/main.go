@@ -96,6 +96,7 @@ func processinline() {
 					Name: "TextDocumentPositionParams",
 				})
 			}
+			break
 		}
 	}
 
