@@ -3,11 +3,16 @@
 // license that can be found in the LICENSE file.
 
 // Code generated for LSP. DO NOT EDIT.
+//
+// Doc comments in this file are verbatim copies from the upstream LSP
+// specification (metaModel.json). Typos, grammar issues, or terminology
+// inconsistencies in comments should be reported to
+// https://github.com/microsoft/vscode-languageserver-node, not patched here.
 
 package protocol
 
-// Code generated from protocol/metaModel.json at ref release/protocol/3.17.6-next.9 (hash c94395b5da53729e6dff931293b051009ccaaaa4).
-// https://github.com/microsoft/vscode-languageserver-node/blob/release/protocol/3.17.6-next.9/protocol/metaModel.json
+// Code generated from protocol/metaModel.json at ref dadd73f7fc283b4d0adb602adadcf4be16ef3a7b.
+// https://github.com/microsoft/vscode-languageserver-node/blob/dadd73f7fc283b4d0adb602adadcf4be16ef3a7b/protocol/metaModel.json
 // LSP metaData.version = 3.17.0.
 
 const (

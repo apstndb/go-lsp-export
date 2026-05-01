@@ -3,11 +3,16 @@
 // license that can be found in the LICENSE file.
 
 // Code generated for LSP. DO NOT EDIT.
+//
+// Doc comments in this file are verbatim copies from the upstream LSP
+// specification (metaModel.json). Typos, grammar issues, or terminology
+// inconsistencies in comments should be reported to
+// https://github.com/microsoft/vscode-languageserver-node, not patched here.
 
 package protocol
 
-// Code generated from protocol/metaModel.json at ref release/protocol/3.17.6-next.9 (hash c94395b5da53729e6dff931293b051009ccaaaa4).
-// https://github.com/microsoft/vscode-languageserver-node/blob/release/protocol/3.17.6-next.9/protocol/metaModel.json
+// Code generated from protocol/metaModel.json at ref dadd73f7fc283b4d0adb602adadcf4be16ef3a7b.
+// https://github.com/microsoft/vscode-languageserver-node/blob/dadd73f7fc283b4d0adb602adadcf4be16ef3a7b/protocol/metaModel.json
 // LSP metaData.version = 3.17.0.
 
 import "encoding/json"
@@ -22,6 +27,12 @@ type AnnotatedTextEdit struct {
 	AnnotationID *ChangeAnnotationIdentifier `json:"annotationId,omitempty"`
 	TextEdit
 }
+
+// Defines how values from a set of defaults and an individual item will be
+// merged.
+//
+// @since 3.18.0
+type ApplyKind uint32
 
 // The parameters passed via an apply workspace edit request.
 //
@@ -567,6 +578,10 @@ type CodeAction struct {
 	//
 	// @since 3.16.0
 	Data *json.RawMessage `json:"data,omitempty"`
+	// Tags for this code action.
+	//
+	// @since 3.18.0 - proposed
+	Tags []CodeActionTag `json:"tags,omitempty"`
 }
 
 // The Client Capabilities of a {@link CodeActionRequest}.
@@ -614,6 +629,11 @@ type CodeActionClientCapabilities struct {
 	// @since 3.18.0
 	// @proposed
 	DocumentationSupport bool `json:"documentationSupport,omitempty"`
+	// Client supports the tag property on a code action. Clients
+	// supporting tags have to handle unknown tags gracefully.
+	//
+	// @since 3.18.0 - proposed
+	TagSupport *CodeActionTagOptions `json:"tagSupport,omitempty"`
 }
 
 // Contains additional diagnostic information about the context in which
@@ -727,6 +747,19 @@ type CodeActionParams struct {
 type CodeActionRegistrationOptions struct {
 	TextDocumentRegistrationOptions
 	CodeActionOptions
+}
+
+// Code action tags are extra annotations that tweak the behavior of a code action.
+//
+// @since 3.18.0 - proposed
+type CodeActionTag uint32
+
+// @since 3.18.0 - proposed
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#codeActionTagOptions
+type CodeActionTagOptions struct {
+	// The tags supported by the client.
+	ValueSet []CodeActionTag `json:"valueSet"`
 }
 
 // The reason why code actions were requested.
@@ -1050,13 +1083,77 @@ type CompletionItem struct {
 	Data interface{} `json:"data,omitempty"`
 }
 
+// Specifies how fields from a completion item should be combined with those
+// from `completionList.itemDefaults`.
+//
+// If unspecified, all fields will be treated as ApplyKind.Replace.
+//
+// If a field's value is ApplyKind.Replace, the value from a completion item (if
+// provided and not `null`) will always be used instead of the value from
+// `completionItem.itemDefaults`.
+//
+// If a field's value is ApplyKind.Merge, the values will be merged using the rules
+// defined against each field below.
+//
+// Servers are only allowed to return `applyKind` if the client
+// signals support for this via the `completionList.applyKindSupport`
+// capability.
+//
+// @since 3.18.0
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#completionItemApplyKinds
+type CompletionItemApplyKinds struct {
+	// Specifies whether commitCharacters on a completion will replace or be
+	// merged with those in `completionList.itemDefaults.commitCharacters`.
+	//
+	// If ApplyKind.Replace, the commit characters from the completion item will
+	// always be used unless not provided, in which case those from
+	// `completionList.itemDefaults.commitCharacters` will be used. An
+	// empty list can be used if a completion item does not have any commit
+	// characters and also should not use those from
+	// `completionList.itemDefaults.commitCharacters`.
+	//
+	// If ApplyKind.Merge the commitCharacters for the completion will be the
+	// union of all values in both `completionList.itemDefaults.commitCharacters`
+	// and the completion's own `commitCharacters`.
+	//
+	// @since 3.18.0
+	CommitCharacters *ApplyKind `json:"commitCharacters,omitempty"`
+	// Specifies whether the `data` field on a completion will replace or
+	// be merged with data from `completionList.itemDefaults.data`.
+	//
+	// If ApplyKind.Replace, the data from the completion item will be used if
+	// provided (and not `null`), otherwise
+	// `completionList.itemDefaults.data` will be used. An empty object can
+	// be used if a completion item does not have any data but also should
+	// not use the value from `completionList.itemDefaults.data`.
+	//
+	// If ApplyKind.Merge, a shallow merge will be performed between
+	// `completionList.itemDefaults.data` and the completion's own data
+	// using the following rules:
+	//
+	//
+	//  - If a completion's `data` field is not provided (or `null`), the
+	//   entire `data` field from `completionList.itemDefaults.data` will be
+	//   used as-is.
+	//  - If a completion's `data` field is provided, each field will
+	//   overwrite the field of the same name in
+	//   `completionList.itemDefaults.data` but no merging of nested fields
+	//   within that value will occur.
+	//
+	// @since 3.18.0
+	Data *ApplyKind `json:"data,omitempty"`
+}
+
 // In many cases the items of an actual completion result share the same
 // value for properties like `commitCharacters` or the range of a text
 // edit. A completion list can therefore define item defaults which will
 // be used if a completion item itself doesn't specify the value.
 //
 // If a completion list specifies a default value and a completion item
-// also specifies a corresponding value the one from the item is used.
+// also specifies a corresponding value, the rules for combining these are
+// defined by `applyKinds` (if the client supports it), defaulting to
+// ApplyKind.Replace.
 //
 // Servers are only allowed to return default values if the client
 // signals support for this via the `completionList.itemDefaults`
@@ -1135,7 +1232,9 @@ type CompletionList struct {
 	// be used if a completion item itself doesn't specify the value.
 	//
 	// If a completion list specifies a default value and a completion item
-	// also specifies a corresponding value the one from the item is used.
+	// also specifies a corresponding value, the rules for combining these are
+	// defined by `applyKinds` (if the client supports it), defaulting to
+	// ApplyKind.Replace.
 	//
 	// Servers are only allowed to return default values if the client
 	// signals support for this via the `completionList.itemDefaults`
@@ -1143,6 +1242,24 @@ type CompletionList struct {
 	//
 	// @since 3.17.0
 	ItemDefaults *CompletionItemDefaults `json:"itemDefaults,omitempty"`
+	// Specifies how fields from a completion item should be combined with those
+	// from `completionList.itemDefaults`.
+	//
+	// If unspecified, all fields will be treated as ApplyKind.Replace.
+	//
+	// If a field's value is ApplyKind.Replace, the value from a completion item
+	// (if provided and not `null`) will always be used instead of the value
+	// from `completionItem.itemDefaults`.
+	//
+	// If a field's value is ApplyKind.Merge, the values will be merged using
+	// the rules defined against each field below.
+	//
+	// Servers are only allowed to return `applyKind` if the client
+	// signals support for this via the `completionList.applyKindSupport`
+	// capability.
+	//
+	// @since 3.18.0
+	ApplyKind *CompletionItemApplyKinds `json:"applyKind,omitempty"`
 	// The completion items.
 	Items []CompletionItem `json:"items"`
 }
@@ -1163,6 +1280,18 @@ type CompletionListCapabilities struct {
 	//
 	// @since 3.17.0
 	ItemDefaults []string `json:"itemDefaults,omitempty"`
+	// Specifies whether the client supports `CompletionList.applyKind` to
+	// indicate how supported values from `completionList.itemDefaults`
+	// and `completion` will be combined.
+	//
+	// If a client supports `applyKind` it must support it for all fields
+	// that it supports that are listed in `CompletionList.applyKind`. This
+	// means when clients add support for new/future fields in completion
+	// items the MUST also support merge for them if those fields are
+	// defined in `CompletionList.applyKind`.
+	//
+	// @since 3.18.0
+	ApplyKindSupport bool `json:"applyKindSupport,omitempty"`
 }
 
 // Completion options.
@@ -1795,7 +1924,7 @@ type DocumentDiagnosticReportPartialResult struct {
 // A document filter describes a top level text document or
 // a notebook cell document.
 //
-// @since 3.17.0 - proposed support for NotebookCellTextDocumentFilter.
+// @since 3.17.0 - support for NotebookCellTextDocumentFilter.
 //
 // See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#documentFilter
 type DocumentFilter = Or_DocumentFilter // (alias)
@@ -2375,14 +2504,14 @@ type FileSystemWatcher struct {
 type FoldingRange struct {
 	// The zero-based start line of the range to fold. The folded area starts after the line's last character.
 	// To be valid, the end must be zero or larger and smaller than the number of lines in the document.
-	StartLine uint32 `json:"startLine"`
+	StartLine *uint32 `json:"startLine,omitempty"`
 	// The zero-based character offset from where the folded range starts. If not defined, defaults to the length of the start line.
-	StartCharacter uint32 `json:"startCharacter,omitempty"`
+	StartCharacter *uint32 `json:"startCharacter,omitempty"`
 	// The zero-based end line of the range to fold. The folded area ends with the line's last character.
 	// To be valid, the end must be zero or larger and smaller than the number of lines in the document.
-	EndLine uint32 `json:"endLine"`
+	EndLine *uint32 `json:"endLine,omitempty"`
 	// The zero-based character offset before the folded range ends. If not defined, defaults to the length of the end line.
-	EndCharacter uint32 `json:"endCharacter,omitempty"`
+	EndCharacter *uint32 `json:"endCharacter,omitempty"`
 	// Describes the kind of the folding range such as 'comment' or 'region'. The kind
 	// is used to categorize folding ranges and used by commands like 'Fold all comments'.
 	// See {@link FoldingRangeKind} for an enumeration of standardized kinds.
@@ -3069,7 +3198,6 @@ type LSPErrorCodes int32
 type LSPObject = map[string]LSPAny // (alias)
 // Predefined Language kinds
 // @since 3.18.0
-// @proposed
 type LanguageKind string
 
 // Client capabilities for the linked editing range request.
@@ -4047,17 +4175,11 @@ type Pattern = string // (alias)
 // See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#position
 type Position struct {
 	// Line position in a document (zero-based).
-	//
-	// If a line number is greater than the number of lines in a document, it defaults back to the number of lines in the document.
-	// If a line number is negative, it defaults to 0.
 	Line uint32 `json:"line"`
 	// Character offset on a line in a document (zero-based).
 	//
 	// The meaning of this offset is determined by the negotiated
 	// `PositionEncodingKind`.
-	//
-	// If the character value is greater than the line length it defaults back to the
-	// line length.
 	Character uint32 `json:"character"`
 }
 
@@ -4376,14 +4498,11 @@ type RenameOptions struct {
 //
 // See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#renameParams
 type RenameParams struct {
-	// The document to rename.
-	TextDocument TextDocumentIdentifier `json:"textDocument"`
-	// The position at which this request was sent.
-	Position Position `json:"position"`
 	// The new name of the symbol. If the given name is not valid the
 	// request must return a {@link ResponseError} with an
 	// appropriate message set.
 	NewName string `json:"newName"`
+	TextDocumentPositionParams
 	WorkDoneProgressParams
 }
 
@@ -4924,7 +5043,7 @@ type SignatureHelp struct {
 	// In future version of the protocol this property might become
 	// mandatory (but still nullable) to better express the active parameter if
 	// the active signature does have any.
-	ActiveParameter uint32 `json:"activeParameter,omitempty"`
+	ActiveParameter *uint32 `json:"activeParameter,omitempty"`
 }
 
 // Client Capabilities for a {@link SignatureHelpRequest}.
@@ -5036,7 +5155,7 @@ type SignatureInformation struct {
 	// `SignatureHelp.activeParameter`.
 	//
 	// @since 3.16.0
-	ActiveParameter uint32 `json:"activeParameter,omitempty"`
+	ActiveParameter *uint32 `json:"activeParameter,omitempty"`
 }
 
 // An interactive text edit.
@@ -5153,6 +5272,10 @@ type TextDocumentChangeRegistrationOptions struct {
 type TextDocumentClientCapabilities struct {
 	// Defines which synchronization capabilities the client supports.
 	Synchronization *TextDocumentSyncClientCapabilities `json:"synchronization,omitempty"`
+	// Defines which filters the client supports.
+	//
+	// @since 3.18.0
+	Filters *TextDocumentFilterClientCapabilities `json:"filters,omitempty"`
 	// Capabilities specific to the `textDocument/completion` request.
 	Completion CompletionClientCapabilities `json:"completion,omitempty"`
 	// Capabilities specific to the `textDocument/hover` request.
@@ -5261,7 +5384,7 @@ type TextDocumentContentChangePartial struct {
 	// The optional length of the range that got replaced.
 	//
 	// @deprecated use range instead.
-	RangeLength uint32 `json:"rangeLength,omitempty"`
+	RangeLength *uint32 `json:"rangeLength,omitempty"`
 	// The new text for the provided range.
 	Text string `json:"text"`
 }
@@ -5292,8 +5415,8 @@ type TextDocumentContentClientCapabilities struct {
 //
 // See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#textDocumentContentOptions
 type TextDocumentContentOptions struct {
-	// The scheme for which the server provides content.
-	Scheme string `json:"scheme"`
+	// The schemes for which the server provides content.
+	Schemes []string `json:"schemes"`
 }
 
 // Parameters for the `workspace/textDocumentContent` request.
@@ -5327,6 +5450,20 @@ type TextDocumentContentRefreshParams struct {
 type TextDocumentContentRegistrationOptions struct {
 	TextDocumentContentOptions
 	StaticRegistrationOptions
+}
+
+// Result of the `workspace/textDocumentContent` request.
+//
+// @since 3.18.0
+// @proposed
+//
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#textDocumentContentResult
+type TextDocumentContentResult struct {
+	// The text content of the text document. Please note, that the content of
+	// any subsequent open notifications for the text document might differ
+	// from the returned content due to whitespace and line ending
+	// normalizations done on the client
+	Text string `json:"text"`
 }
 
 // Describes textual changes on a text document. A TextDocumentEdit describes all changes
@@ -5368,6 +5505,14 @@ type TextDocumentEdit struct {
 //
 // See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#textDocumentFilter
 type TextDocumentFilter = Or_TextDocumentFilter // (alias)
+// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#textDocumentFilterClientCapabilities
+type TextDocumentFilterClientCapabilities struct {
+	// The client supports Relative Patterns.
+	//
+	// @since 3.18.0
+	RelativePatternSupport bool `json:"relativePatternSupport,omitempty"`
+}
+
 // A document filter where `language` is required field.
 //
 // @since 3.18.0
@@ -5380,7 +5525,9 @@ type TextDocumentFilterLanguage struct {
 	Scheme string `json:"scheme,omitempty"`
 	// A glob pattern, like **​/*.{ts,js}. See TextDocumentFilter for examples.
 	//
-	// @since 3.18.0 - support for relative patterns.
+	// @since 3.18.0 - support for relative patterns. Whether clients support
+	// relative patterns depends on the client capability
+	// `textDocuments.filters.relativePatternSupport`.
 	Pattern *GlobPattern `json:"pattern,omitempty"`
 }
 
@@ -5396,7 +5543,9 @@ type TextDocumentFilterPattern struct {
 	Scheme string `json:"scheme,omitempty"`
 	// A glob pattern, like **​/*.{ts,js}. See TextDocumentFilter for examples.
 	//
-	// @since 3.18.0 - support for relative patterns.
+	// @since 3.18.0 - support for relative patterns. Whether clients support
+	// relative patterns depends on the client capability
+	// `textDocuments.filters.relativePatternSupport`.
 	Pattern GlobPattern `json:"pattern"`
 }
 
@@ -5412,7 +5561,9 @@ type TextDocumentFilterScheme struct {
 	Scheme string `json:"scheme"`
 	// A glob pattern, like **​/*.{ts,js}. See TextDocumentFilter for examples.
 	//
-	// @since 3.18.0 - support for relative patterns.
+	// @since 3.18.0 - support for relative patterns. Whether clients support
+	// relative patterns depends on the client capability
+	// `textDocuments.filters.relativePatternSupport`.
 	Pattern *GlobPattern `json:"pattern,omitempty"`
 }
 
@@ -5764,7 +5915,7 @@ type WorkDoneProgressBegin struct {
 	//
 	// The value should be steadily rising. Clients are free to ignore values
 	// that are not following this rule. The value range is [0, 100].
-	Percentage uint32 `json:"percentage,omitempty"`
+	Percentage *uint32 `json:"percentage,omitempty"`
 }
 
 // See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#workDoneProgressCancelParams
@@ -5824,7 +5975,7 @@ type WorkDoneProgressReport struct {
 	//
 	// The value should be steadily rising. Clients are free to ignore values
 	// that are not following this rule. The value range is [0, 100]
-	Percentage uint32 `json:"percentage,omitempty"`
+	Percentage *uint32 `json:"percentage,omitempty"`
 }
 
 // Workspace specific client capabilities.
@@ -6294,6 +6445,18 @@ type _InitializeParams struct {
 }
 
 const (
+	// Defines how values from a set of defaults and an individual item will be
+	// merged.
+	//
+	// @since 3.18.0
+	// The value from the individual item (if provided and not `null`) will be
+	// used instead of the default.
+	Replace ApplyKind = 1
+	// The value from the item will be merged with the default.
+	//
+	// The specific rules for mergeing values are defined against each field
+	// that supports merging.
+	Merge ApplyKind = 2
 	// A set of predefined code action kinds
 	// Empty kind.
 	Empty CodeActionKind = ""
@@ -6365,6 +6528,11 @@ const (
 	//
 	// @since 3.18.0
 	Notebook CodeActionKind = "notebook"
+	// Code action tags are extra annotations that tweak the behavior of a code action.
+	//
+	// @since 3.18.0 - proposed
+	// Marks the code action as LLM-generated.
+	LLMGenerated CodeActionTag = 1
 	// The reason why code actions were requested.
 	//
 	// @since 3.17.0
@@ -6571,7 +6739,6 @@ const (
 	RequestCancelled LSPErrorCodes = -32800
 	// Predefined Language kinds
 	// @since 3.18.0
-	// @proposed
 	LangABAP         LanguageKind = "abap"
 	LangWindowsBat   LanguageKind = "bat"
 	LangBibTeX       LanguageKind = "bibtex"

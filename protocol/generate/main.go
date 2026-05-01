@@ -20,6 +20,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -73,6 +74,31 @@ func processinline() {
 	}
 
 	model := parse(filepath.Join(*repodir, "protocol/metaModel.json"))
+
+	// Although the LSP specification defines RenameParams as extending
+	// TextDocumentPositionParams, the metaModel.json definition flattens
+	// these properties (likely due to specific comments in the TS definition).
+	// See microsoft/vscode-languageserver-node#1698.
+	//
+	// TODO: delete the patch logic after releasing lsp 3.18.
+	// model.Structures is []*Structure, so s is a pointer copy.
+	// Mutating s.Properties / s.Extends affects the original element.
+	for _, s := range model.Structures {
+		if s.Name == "RenameParams" {
+			s.Properties = slices.DeleteFunc(s.Properties, func(t NameType) bool {
+				return t.Name == "position" || t.Name == "textDocument"
+			})
+			if !slices.ContainsFunc(s.Extends, func(t *Type) bool {
+				return t.Kind == "reference" && t.Name == "TextDocumentPositionParams"
+			}) {
+				s.Extends = append(s.Extends, &Type{
+					Kind: "reference",
+					Name: "TextDocumentPositionParams",
+				})
+			}
+			break
+		}
+	}
 
 	findTypeNames(model)
 	generateOutput(model)
@@ -239,45 +265,42 @@ func formatTo(basename string, src []byte) {
 
 // create the common file header for the output files
 func fileHeader(model *Model) string {
-	fname := filepath.Join(*repodir, ".git", "HEAD")
-	buf, err := os.ReadFile(fname)
+	cmd := exec.Command("git", "-C", *repodir, "rev-parse", "HEAD")
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	buf, err := cmd.Output()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("git rev-parse HEAD in %s failed: %v: %s", *repodir, err, strings.TrimSpace(stderr.String()))
 	}
-	buf = bytes.TrimSpace(buf)
-	var githash string
-	if len(buf) == 40 {
-		githash = string(buf[:40])
-	} else if bytes.HasPrefix(buf, []byte("ref: ")) {
-		fname = filepath.Join(*repodir, ".git", string(buf[5:]))
-		buf, err = os.ReadFile(fname)
-		if err != nil {
-			log.Fatal(err)
-		}
-		githash = string(buf[:40])
-	} else {
-		log.Fatalf("githash cannot be recovered from %s", fname)
-	}
+	githash := string(bytes.TrimSpace(buf))
+
+	// Always use the commit hash as the ref so generated headers are deterministic
+	// across different invocation modes (with or without -d) and blob URLs remain valid.
+	ref := githash
 
 	format := `// Copyright 2023 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 // Code generated for LSP. DO NOT EDIT.
+//
+// Doc comments in this file are verbatim copies from the upstream LSP
+// specification (metaModel.json). Typos, grammar issues, or terminology
+// inconsistencies in comments should be reported to
+// https://github.com/microsoft/vscode-languageserver-node, not patched here.
 
 package protocol
 
-// Code generated from %[1]s at ref %[2]s (hash %[3]s).
-// %[4]s/blob/%[2]s/%[1]s
-// LSP metaData.version = %[5]s.
+// Code generated from %[1]s at ref %[2]s.
+// %[3]s/blob/%[2]s/%[1]s
+// LSP metaData.version = %[4]s.
 
 `
 	return fmt.Sprintf(format,
 		"protocol/metaModel.json", // 1
-		lspGitRef,                 // 2
-		githash,                   // 3
-		vscodeRepo,                // 4
-		model.Version.Version) // 5
+		ref,                       // 2
+		vscodeRepo,                // 3
+		model.Version.Version)     // 4
 }
 
 func parse(fname string) *Model {

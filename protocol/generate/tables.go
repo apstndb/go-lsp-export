@@ -34,20 +34,31 @@ var goplsStar = map[prop]int{
 	{"CompletionItem", "kind"}:                         wantOpt, // need temporary variables
 	{"CompletionParams", "context"}:                    wantOpt, // needs nil checks
 
-	{"Diagnostic", "severity"}:            wantOpt,     // nil checks or more careful thought
+	{"Diagnostic", "severity"}:            wantOpt,     // needs nil checks or more careful thought
 	{"DidSaveTextDocumentParams", "text"}: wantOptStar, // capabilities_test.go:112 logic
 	{"DocumentHighlight", "kind"}:         wantOpt,     // need temporary variables
-	{"Hover", "range"}:                    wantOpt,     // complex expressions
-	{"InlayHint", "kind"}:                 wantOpt,     // temporary variables
 
+	{"FoldingRange", "startLine"}:      wantOptStar, // unset != zero (#71489)
+	{"FoldingRange", "startCharacter"}: wantOptStar, // unset != zero (#71489)
+	{"FoldingRange", "endLine"}:        wantOptStar, // unset != zero (#71489)
+	{"FoldingRange", "endCharacter"}:   wantOptStar, // unset != zero (#71489)
+
+	{"Hover", "range"}:    wantOpt, // complex expressions
+	{"InlayHint", "kind"}: wantOpt, // temporary variables
+
+	{"SignatureHelp", "activeParameter"}:                      wantOptStar, // unset != zero
+	{"SignatureInformation", "activeParameter"}:               wantOptStar, // unset != zero
 	{"TextDocumentClientCapabilities", "codeAction"}:          wantOpt,     // A.B.C.D
 	{"TextDocumentClientCapabilities", "completion"}:          wantOpt,     // A.B.C.D
 	{"TextDocumentClientCapabilities", "documentSymbol"}:      wantOpt,     // A.B.C.D
-	{"TextDocumentClientCapabilities", "publishDiagnostics"}:  wantOpt,     //A.B.C.D
+	{"TextDocumentClientCapabilities", "publishDiagnostics"}:  wantOpt,     // A.B.C.D
 	{"TextDocumentClientCapabilities", "semanticTokens"}:      wantOpt,     // A.B.C.D
 	{"TextDocumentContentChangePartial", "range"}:             wantOptStar, // == nil test
+	{"TextDocumentContentChangePartial", "rangeLength"}:       wantOptStar, // unset != zero
 	{"TextDocumentSyncOptions", "change"}:                     wantOpt,     // &constant
+	{"WorkDoneProgressBegin", "percentage"}:                   wantOptStar, // unset != zero
 	{"WorkDoneProgressParams", "workDoneToken"}:               wantOpt,     // test failures
+	{"WorkDoneProgressReport", "percentage"}:                  wantOptStar, // unset != zero
 	{"WorkspaceClientCapabilities", "didChangeConfiguration"}: wantOpt,     // A.B.C.D
 	{"WorkspaceClientCapabilities", "didChangeWatchedFiles"}:  wantOpt,     // A.B.C.D
 }
